@@ -18,6 +18,7 @@
 %% External exports
 %%--------------------------------------------------------------------
 -export([start_link/0
+	 ,start_link/1
          ,start/0
          ,stop/1
          ,cd/2
@@ -54,6 +55,19 @@
 %%--------------------------------------------------------------------
 start_link() ->
     gen_server:start_link(?MODULE, [], []).
+
+%%--------------------------------------------------------------------
+%% @doc Starts the server and registers it under a name.
+%% @spec start_link() -> {ok, pid()} | {error, Reason}
+%% @end
+%%--------------------------------------------------------------------
+start_link(Name) ->
+    case start_link() of
+	{ok, Pid} ->
+	    register( Name, Pid ),
+	    {ok, Pid};
+	Any -> Any
+    end.
 
 %%--------------------------------------------------------------------
 %% @doc Starts the server.

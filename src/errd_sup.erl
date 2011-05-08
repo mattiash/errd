@@ -1,5 +1,13 @@
 %%%-------------------------------------------------------------------
-%%% @doc Supervises Erlang RRD processes.
+%%% @doc Starts and supervises an errd_server process.
+%%% The process is available under a registered name.
+%%% Note however that if the process dies and is restarted,
+%%% then there is a short period of time during which
+%%% no process is registered and any gen_server:cast during
+%%% that time will be discarded and any gen_server:call will fail.
+%%% See http://stackoverflow.com/questions/4348040/registering-a-child-in-the-process-that-initiated-the-start-child-call
+%%% for possible solutions.
+%%%
 %%% @end
 %%% @author Geoff Cant <nem@lisp.geek.nz>
 %%%-------------------------------------------------------------------
@@ -59,14 +67,15 @@ init([]) ->
     
     ChildSpecs =
 	[
-	 {errd_server_sup,
-	  {errd_server_sup, start_link, []},
+	 {errd_server,
+	  {errd_server, start_link, [errd_server]},
 	  permanent,
-	  1000,
-	  supervisor,
+	  10,
+	  worker,
 	  [errd_server]}
 	 ],
     {ok,{SupFlags, ChildSpecs}}.
+
 %%====================================================================
 %% Internal functions
 %%====================================================================
